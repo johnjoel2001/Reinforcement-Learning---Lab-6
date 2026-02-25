@@ -12,14 +12,21 @@ import uuid
 from datetime import datetime
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from pathlib import Path
+
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import openai
 
 from database import save_preference, get_all_preferences, get_training_pairs, get_record_count, get_preferred_for_prompt
 
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
+BASE_DIR = Path(__file__).resolve().parent
+DIST_DIR = BASE_DIR / "frontend" / "dist"
 
 app = FastAPI(title="Preference Collector API")
 
@@ -519,3 +526,18 @@ def rlhf_compare(req: RLHFCompareRequest):
         "aligned_response": aligned_response,
         "num_training_examples": len(_rlhf_trained_data),
     }
+
+
+# ---------------------------------------------------------------------------
+# Serve React frontend (production build)
+# ---------------------------------------------------------------------------
+if DIST_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=DIST_DIR / "assets"), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(request: Request, full_path: str):
+        """Serve the React SPA for any non-API route."""
+        file_path = DIST_DIR / full_path
+        if file_path.exists() and file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(DIST_DIR / "index.html")
