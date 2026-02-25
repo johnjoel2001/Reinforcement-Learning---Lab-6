@@ -1,0 +1,6 @@
+streamlit==1.41.0
+openai==1.61.0
+pandas==2.2.3
+supabase>=2.0.0
+python-dotenv>=1.0.0
+httpx>=0.26,<0.28
