@@ -214,6 +214,30 @@ def export_full():
     return get_all_preferences()
 
 
+@app.get("/api/export/csv")
+def export_csv():
+    """Export all preference records as a downloadable CSV."""
+    import csv
+    import io
+    from fastapi.responses import StreamingResponse
+
+    rows = get_all_preferences()
+    if not rows:
+        raise HTTPException(404, "No preference records found.")
+
+    buf = io.StringIO()
+    writer = csv.DictWriter(buf, fieldnames=rows[0].keys())
+    writer.writeheader()
+    writer.writerows(rows)
+    buf.seek(0)
+
+    return StreamingResponse(
+        iter([buf.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=preferences.csv"},
+    )
+
+
 @app.post("/api/fine-tune-check")
 def fine_tune_check(req: dict):
     """Check if a prompt has prior preference data (fine-tuned response)."""

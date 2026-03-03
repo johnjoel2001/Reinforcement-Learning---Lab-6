@@ -284,12 +284,12 @@ function App() {
                 JSON
               </a>
               <a
-                href={`${API}/export/full`}
-                target="_blank"
-                className="flex-1 flex items-center justify-center gap-1.5 bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all rounded-xl px-2 py-2.5 text-xs font-semibold text-purple-300"
+                href={`${API}/export/csv`}
+                download="preferences.csv"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all rounded-xl px-2 py-2.5 text-xs font-semibold text-emerald-300"
               >
                 <Download className="h-3 w-3" />
-                Full
+                CSV
               </a>
             </div>
           </div>
